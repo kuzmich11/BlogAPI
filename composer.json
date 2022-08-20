@@ -1,5 +1,5 @@
 {
-    "name": "kuznetsov_vladimir/blog-api",
+    "name": "kuznetsov_vladimir/blog_api",
     "autoload": {
         "psr-4": {
             "KuznetsovVladimir\\BlogApi\\": "src/"
@@ -11,5 +11,7 @@
             "email": "v.a.kuznetsov-83@yandex.ru"
         }
     ],
-    "require": {}
+    "require": {
+        "fakerphp/faker": "^1.20"
+    }
 }

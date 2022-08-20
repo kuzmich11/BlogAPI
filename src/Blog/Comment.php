@@ -3,25 +3,26 @@
 namespace KuznetsovVladimir\BlogApi\Blog;
 use KuznetsovVladimir\BlogApi\User\User;
 
-class Post
+
+class Comment
 {
     private int $id;
     private User $author;
-    private string $header;
-    private string $text;
+    private Post $post;
+    private string $textComment;
 
     /**
      * @param int $id
      * @param User $author
-     * @param string $header
-     * @param string $text
+     * @param Post $post
+     * @param string $textComment
      */
-    public function __construct(int $id, User $author, string $header, string $text)
+    public function __construct(int $id, User $author, Post $post, string $textComment)
     {
         $this->id = $id;
         $this->author = $author;
-        $this->header = $header;
-        $this->text = $text;
+        $this->post = $post;
+        $this->textComment = $textComment;
     }
 
     /**
@@ -57,40 +58,40 @@ class Post
     }
 
     /**
+     * @return Post
+     */
+    public function getPost(): Post
+    {
+        return $this->post;
+    }
+
+    /**
+     * @param Post $post
+     */
+    public function setPost(Post $post): void
+    {
+        $this->post = $post;
+    }
+
+    /**
      * @return string
      */
-    public function getHeader(): string
+    public function getTextComment(): string
     {
-        return $this->header;
+        return $this->textComment;
     }
 
     /**
-     * @param string $header
+     * @param string $textComment
      */
-    public function setHeader(string $header): void
+    public function setTextComment(string $textComment): void
     {
-        $this->header = $header;
+        $this->textComment = $textComment;
     }
 
-    /**
-     * @return string
-     */
-    public function getText(): string
+    public function __toString(): string
     {
-        return $this->text;
-    }
-
-    /**
-     * @param string $text
-     */
-    public function setText(string $text): void
-    {
-        $this->text = $text;
-    }
-
-    public function __toString()
-    {
-        return "$this->header\n$this->text\nАвтор статьи: $this->author";
+        return "$this->textComment\n$this->author";
     }
 
 }
