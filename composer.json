@@ -1,0 +1,15 @@
+{
+    "name": "kuznetsov_vladimir/blog-api",
+    "autoload": {
+        "psr-4": {
+            "KuznetsovVladimir\\BlogApi\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Vladimir Kuznetsov",
+            "email": "v.a.kuznetsov-83@yandex.ru"
+        }
+    ],
+    "require": {}
+}
