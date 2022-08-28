@@ -3,12 +3,10 @@
 namespace KuznetsovVladimir\BlogApi\Blog\Commands;
 
 use KuznetsovVladimir\BlogApi\Blog\Comment;
-use KuznetsovVladimir\BlogApi\Blog\Post;
-use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\CommentsRepositoryInterface;
-use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\PostsRepositoryInterface;
+use KuznetsovVladimir\BlogApi\Blog\Repositories\CommentsRepository\CommentsRepositoryInterface;
+use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
-use KuznetsovVladimir\BlogApi\User\User;
 
 class CreateCommentCommand
 {
