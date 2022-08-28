@@ -2,75 +2,79 @@
 
 namespace KuznetsovVladimir\BlogApi\User;
 
+
+use KuznetsovVladimir\BlogApi\Blog\UUID;
+
 class User
 {
-    private int $id;
-    private string $firstName;
-    private string $lastName;
+    private UUID $uuid;
+    private string $username;
+    private Name $name;
 
     /**
-     * @param int $id
-     * @param string $firstName
-     * @param string $lastName
+     * @param UUID $uuid
+     * @param Name $name
+     * @param string $username
      */
-    public function __construct(int $id, string $firstName, string $lastName)
+    public function __construct(UUID $uuid, string $username, Name $name)
     {
-        $this->id = $id;
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
+        $this->uuid = $uuid;
+        $this->name = $name;
+        $this->username = $username;
+    }
+
+
+    /**
+     * @return UUID $uuid
+     */
+    public function uuid(): UUID
+    {
+        return $this->uuid;
     }
 
     /**
-     * @return int
+     * @param UUID $uuid
      */
-    public function getId(): int
+    public function setId(UUID $uuid): void
     {
-        return $this->id;
+        $this->uuid = $uuid;
     }
 
     /**
-     * @param int $id
+     * @return Name
      */
-    public function setId(int $id): void
+    public function name(): Name
     {
-        $this->id = $id;
+        return $this->name;
+    }
+
+    /**
+     * @param Name $name
+     */
+    public function setName(Name $name): void
+    {
+        $this->name = $name;
     }
 
     /**
      * @return string
      */
-    public function getFirstName(): string
+    public function username(): string
     {
-        return $this->firstName;
+        return $this->username;
     }
 
     /**
-     * @param string $firstName
+     * @param string $username
      */
-    public function setFirstName(string $firstName): void
+    public function setUsername(string $username): void
     {
-        $this->firstName = $firstName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
-
-    /**
-     * @param string $lastName
-     */
-    public function setLastName(string $lastName): void
-    {
-        $this->lastName = $lastName;
+        $this->username = $username;
     }
 
     public function __toString()
     {
-        return $this->firstName . ' ' . $this->lastName;
+        return $this->name . ' c логином ' . $this->username;
     }
 
 }

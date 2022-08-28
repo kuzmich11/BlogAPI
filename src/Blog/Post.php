@@ -1,81 +1,74 @@
 <?php
 
 namespace KuznetsovVladimir\BlogApi\Blog;
+
 use KuznetsovVladimir\BlogApi\User\User;
+
 
 class Post
 {
-    private int $id;
-    private User $author;
-    private string $header;
-    private string $text;
 
-    /**
-     * @param int $id
-     * @param User $author
-     * @param string $header
-     * @param string $text
-     */
-    public function __construct(int $id, User $author, string $header, string $text)
+    public function __construct(
+        private UUID   $uuid,
+        private User   $user,
+        private string $title,
+        private string $text
+    )
     {
-        $this->id = $id;
-        $this->author = $author;
-        $this->header = $header;
-        $this->text = $text;
     }
 
     /**
-     * @return int
+     * @return UUID
      */
-    public function getId(): int
+    public function uuid(): UUID
     {
-        return $this->id;
+        return $this->uuid;
     }
 
     /**
-     * @param int $id
+     * @param UUID $uuid
      */
-    public function setId(int $id): void
+    public function setUuid(UUID $uuid): void
     {
-        $this->id = $id;
+        $this->uuid = $uuid;
     }
 
     /**
      * @return User
      */
-    public function getAuthor(): User
+    public function user(): User
     {
-        return $this->author;
+        return $this->user;
     }
 
     /**
-     * @param User $author
+     * @param User $user
      */
-    public function setAuthor(User $author): void
+    public function setUser(User $user): void
     {
-        $this->author = $author;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHeader(): string
-    {
-        return $this->header;
-    }
-
-    /**
-     * @param string $header
-     */
-    public function setHeader(string $header): void
-    {
-        $this->header = $header;
+        $this->user = $user;
     }
 
     /**
      * @return string
      */
-    public function getText(): string
+    public function title(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle(string $title): void
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function text(): string
     {
         return $this->text;
     }
@@ -90,7 +83,7 @@ class Post
 
     public function __toString()
     {
-        return "$this->header\n$this->text\nАвтор статьи: $this->author";
+        return "$this->title\n$this->text\nАвтор статьи: $this->user";
     }
 
 }

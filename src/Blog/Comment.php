@@ -6,61 +6,52 @@ use KuznetsovVladimir\BlogApi\User\User;
 
 class Comment
 {
-    private int $id;
-    private User $author;
-    private Post $post;
-    private string $textComment;
 
-    /**
-     * @param int $id
-     * @param User $author
-     * @param Post $post
-     * @param string $textComment
-     */
-    public function __construct(int $id, User $author, Post $post, string $textComment)
+    public function __construct(
+        private UUID $uuid,
+    private User $user,
+    private Post $post,
+    private string $text
+    )
     {
-        $this->id = $id;
-        $this->author = $author;
-        $this->post = $post;
-        $this->textComment = $textComment;
     }
 
     /**
-     * @return int
+     * @return UUID
      */
-    public function getId(): int
+    public function uuid(): UUID
     {
-        return $this->id;
+        return $this->uuid;
     }
 
     /**
-     * @param int $id
+     * @param UUID $uuid
      */
-    public function setId(int $id): void
+    public function setUuid(UUID $uuid): void
     {
-        $this->id = $id;
+        $this->uuid = $uuid;
     }
 
     /**
      * @return User
      */
-    public function getAuthor(): User
+    public function user(): User
     {
-        return $this->author;
+        return $this->user;
     }
 
     /**
-     * @param User $author
+     * @param User $user
      */
-    public function setAuthor(User $author): void
+    public function setUser(User $user): void
     {
-        $this->author = $author;
+        $this->user = $user;
     }
 
     /**
      * @return Post
      */
-    public function getPost(): Post
+    public function post(): Post
     {
         return $this->post;
     }
@@ -76,22 +67,22 @@ class Comment
     /**
      * @return string
      */
-    public function getTextComment(): string
+    public function text(): string
     {
-        return $this->textComment;
+        return $this->text;
     }
 
     /**
-     * @param string $textComment
+     * @param string $text
      */
-    public function setTextComment(string $textComment): void
+    public function setText(string $text): void
     {
-        $this->textComment = $textComment;
+        $this->text = $text;
     }
 
     public function __toString(): string
     {
-        return "$this->textComment\n$this->author";
+        return "$this->text\n$this->user";
     }
 
 }
