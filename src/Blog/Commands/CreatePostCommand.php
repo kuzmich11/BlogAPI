@@ -2,15 +2,10 @@
 
 namespace KuznetsovVladimir\BlogApi\Blog\Commands;
 
-use KuznetsovVladimir\BlogApi\Blog\Exceptions\CommandException;
-use KuznetsovVladimir\BlogApi\Blog\Exceptions\PostNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Post;
-use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\PostsRepositoryInterface;
-use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\SqliteUsersRepository;
+use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
-use KuznetsovVladimir\BlogApi\User\User;
-use PDO;
 
 class CreatePostCommand
 {

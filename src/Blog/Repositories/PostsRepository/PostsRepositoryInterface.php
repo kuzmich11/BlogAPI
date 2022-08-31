@@ -1,6 +1,6 @@
 <?php
 
-namespace KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository;
+namespace KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository;
 
 use KuznetsovVladimir\BlogApi\Blog\Post;
 use KuznetsovVladimir\BlogApi\Blog\UUID;

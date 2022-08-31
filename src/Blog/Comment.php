@@ -1,6 +1,7 @@
 <?php
 
 namespace KuznetsovVladimir\BlogApi\Blog;
+
 use KuznetsovVladimir\BlogApi\User\User;
 
 
@@ -8,10 +9,10 @@ class Comment
 {
 
     public function __construct(
-        private UUID $uuid,
-    private User $user,
-    private Post $post,
-    private string $text
+        private UUID   $uuid,
+        private User   $user,
+        private Post   $post,
+        private string $text
     )
     {
     }

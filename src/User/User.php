@@ -35,7 +35,7 @@ class User
     /**
      * @param UUID $uuid
      */
-    public function setId(UUID $uuid): void
+    public function setUuid(UUID $uuid): void
     {
         $this->uuid = $uuid;
     }
