@@ -1,0 +1,253 @@
+<?php
+
+namespace KuznetsovVladimir\BlogApi\Blog\UnitTests\Http\Actions\LikesPost;
+
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\LikeNotFoundException;
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\PostNotFoundException;
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\UserNotFoundException;
+use KuznetsovVladimir\BlogApi\Blog\LikePost;
+use KuznetsovVladimir\BlogApi\Blog\Post;
+use KuznetsovVladimir\BlogApi\Blog\Repositories\LikesPostRepository\LikesPostRepositoryInterface;
+use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
+use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
+use KuznetsovVladimir\BlogApi\Blog\User;
+use KuznetsovVladimir\BlogApi\Blog\UUID;
+use KuznetsovVladimir\BlogApi\Http\Actions\LikesPost\CreateLikePost;
+use KuznetsovVladimir\BlogApi\Http\ErrorResponse;
+use KuznetsovVladimir\BlogApi\Http\Request;
+use KuznetsovVladimir\BlogApi\Http\SuccessfulResponse;
+use KuznetsovVladimir\BlogApi\User\Name;
+use PHPUnit\Framework\TestCase;
+
+class CreateLikePostTest extends TestCase
+{
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testItReturnsSuccessfulResponse(): void
+    {
+        $request = new Request(
+            [],
+            [],
+            '{
+            "user_uuid": "38830eb6-d2cf-44f9-a7dd-5e7d634eac77",
+            "post_uuid": "52763e12-b5b8-4d17-961b-334bbc2fa686"
+            }'
+        );
+
+        $usersRepository = $this->usersRepository([new User (
+            new UUID('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'),
+            'ivan',
+            new Name('Ivan', 'Nikitin')
+        )]);
+
+        $postsRepository = $this->postsRepository([new Post(
+            new UUID('52763e12-b5b8-4d17-961b-334bbc2fa686'),
+            new User(
+                new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
+                'ivan2',
+                new Name('Ivan', 'Nikitin')
+            ),
+            'Заголовок',
+            'Какой-то текст'
+        )]);
+
+        $likesPostRepository = $this->likesPostRepository([]);
+
+        $action = new CreateLikePost($likesPostRepository, $postsRepository, $usersRepository);
+        $response = $action->handle($request);
+
+        $this->assertInstanceOf(SuccessfulResponse::class, $response);
+        $this->expectOutputString("{\"success\":true,\"data\":{\"uuid\":\"{$likesPostRepository->returnUuid(0)}\"}}");
+
+        $response->send();
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testItReturnErrorIFInvalidFormatUuid(): void
+    {
+        $request = new Request(
+            [],
+            [],
+            '{
+            "user_uuid": "38830eb6-d2cf-44f9-a7dd-5e7d634eac7",
+            "post_uuid": "52763e12-b5b8-4d17-961b-334bbc2fa686"
+            }'
+        );
+        $usersRepository = $this->usersRepository([]);
+
+        $postsRepository = $this->postsRepository([]);
+
+        $likesPostRepository = $this->likesPostRepository([]);
+
+        $action = new CreateLikePost($likesPostRepository, $postsRepository, $usersRepository);
+        $response = $action->handle($request);
+
+        $this->assertInstanceOf(ErrorResponse::class, $response);
+        $this->expectOutputString(
+            "{\"success\":false,\"reason\":\"Malformed UUID: 38830eb6-d2cf-44f9-a7dd-5e7d634eac7\"}");
+
+        $response->send();
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testItReturnErrorIFUserNotFound(): void
+    {
+        $request = new Request(
+            [],
+            [],
+            '{
+            "user_uuid": "38830eb6-d2cf-44f9-a7dd-5e7d634eac77",
+            "post_uuid": "52763e12-b5b8-4d17-961b-334bbc2fa686",
+            "text": "TEXT"
+            }'
+        );
+        $usersRepository = $this->usersRepository([]);
+
+        $postsRepository = $this->postsRepository([]);
+
+        $likesPostRepository = $this->likesPostRepository([]);
+
+        $action = new CreateLikePost($likesPostRepository, $postsRepository, $usersRepository);
+        $response = $action->handle($request);
+
+        $this->assertInstanceOf(ErrorResponse::class, $response);
+        $this->expectOutputString(
+            "{\"success\":false,\"reason\":\"User not found\"}");
+
+        $response->send();
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testItReturnErrorIFNotAllData(): void
+    {
+        $request = new Request(
+            [],
+            [],
+            '{
+            }'
+        );
+        $usersRepository = $this->usersRepository([]);
+
+        $postsRepository = $this->postsRepository([]);
+
+        $likesPostRepository = $this->likesPostRepository([]);
+
+        $action = new CreateLikePost($likesPostRepository, $postsRepository, $usersRepository);
+        $response = $action->handle($request);
+
+        $this->assertInstanceOf(ErrorResponse::class, $response);
+        $this->expectOutputString(
+            "{\"success\":false,\"reason\":\"No such field: user_uuid\"}");
+
+        $response->send();
+    }
+
+    private function likesPostRepository(array $likesPost):  LikesPostRepositoryInterface
+    {
+        return new class ($likesPost) implements LikesPostRepositoryInterface
+        {
+            public function __construct(
+                private array $likesPost
+            ) {
+            }
+            public function save(LikePost $like): void
+            {
+                $this->likesPost[0]=$like;
+            }
+
+            public function get(UUID $uuid): LikePost
+            {
+                foreach ($this->likesPost as $like) {
+                    if ($like instanceof LikePost && $uuid === $like->uuid())
+                    {
+                        return $like;
+                    }
+                }
+                throw new LikeNotFoundException("Not found");
+            }
+            public function returnUuid(int $number): string
+            {
+                return $this->likesPost[$number]->uuid();
+            }
+
+            public function getByPostUuid(UUID $post_uuid): LikePost
+            {
+                throw new LikeNotFoundException("Not found");
+            }
+            public function checkLike(UUID $postUuid, UUID $userUuid) {
+
+            }
+        };
+
+    }
+
+    private function usersRepository(array $users):  UsersRepositoryInterface
+    {
+        return new class ($users) implements usersRepositoryInterface
+        {
+            public function __construct(
+                private array $users
+            ) {
+            }
+            public function save(User $user): void
+            {
+            }
+            public function get(UUID $uuid): User
+            {
+                foreach ($this->users as $user) {
+                    if ($user instanceof User && $uuid == $user->uuid())
+                    {
+                        return $user;
+                    }
+                }
+                throw new UserNotFoundException("Not found");
+            }
+
+            public function getByUsername(string $username): User
+            {
+                throw new UserNotFoundException("Not found");
+            }
+        };
+    }
+
+    private function postsRepository(array $posts):  PostsRepositoryInterface
+    {
+        return new class ($posts) implements PostsRepositoryInterface
+        {
+            public function __construct(
+                private array $posts
+            ) {
+            }
+            public function save(Post $posts): void
+            {
+
+            }
+
+            public function get(UUID $uuid): Post
+            {
+                foreach ($this->posts as $post) {
+                    if ($post instanceof Post && $uuid == $post->uuid())
+                    {
+                        return $post;
+                    }
+                }
+                throw new PostNotFoundException("Not found");
+            }
+            public function delete(UUID $uuid): void
+            {
+            }
+
+        };
+    }
+}

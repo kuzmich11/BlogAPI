@@ -5,6 +5,11 @@
             "KuznetsovVladimir\\BlogApi\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "KuznetsovVladimir\\BlogApi\\Blog\\UnitTests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Vladimir Kuznetsov",
@@ -15,7 +20,7 @@
         "fakerphp/faker": "^1.20",
       "ext-pdo": "*",
         "symfony/polyfill-uuid": "^1.26",
-
+        "psr/container": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
