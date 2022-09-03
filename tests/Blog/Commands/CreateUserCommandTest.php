@@ -9,8 +9,8 @@ use KuznetsovVladimir\BlogApi\Blog\Exceptions\CommandException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\UserNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\DummyUsersRepository;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
+use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
-use KuznetsovVladimir\BlogApi\User\User;
 use PHPUnit\Framework\TestCase;
 
 class CreateUserCommandTest extends TestCase

@@ -1,11 +1,10 @@
 <?php
 
-namespace KuznetsovVladimir\BlogApi\Blog\UnitTests\User;
+namespace KuznetsovVladimir\BlogApi\Blog\UnitTests\Blog\Repositories;
 
+use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\User\Name;
-use KuznetsovVladimir\BlogApi\User\User;
-
 use PHPUnit\Framework\TestCase;
 
 class UserTest extends TestCase
