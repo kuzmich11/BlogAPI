@@ -4,9 +4,9 @@ namespace KuznetsovVladimir\BlogApi\Blog\UnitTests\Blog;
 
 use KuznetsovVladimir\BlogApi\Blog\Comment;
 use KuznetsovVladimir\BlogApi\Blog\Post;
+use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\User\Name;
-use KuznetsovVladimir\BlogApi\User\User;
 use PHPUnit\Framework\TestCase;
 
 class CommentTest extends TestCase

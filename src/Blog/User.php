@@ -1,9 +1,9 @@
 <?php
 
-namespace KuznetsovVladimir\BlogApi\User;
+namespace KuznetsovVladimir\BlogApi\Blog;
 
 
-use KuznetsovVladimir\BlogApi\Blog\UUID;
+use KuznetsovVladimir\BlogApi\User\Name;
 
 class User
 {

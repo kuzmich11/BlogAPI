@@ -2,9 +2,6 @@
 
 namespace KuznetsovVladimir\BlogApi\Blog;
 
-use KuznetsovVladimir\BlogApi\User\User;
-
-
 class Post
 {
 

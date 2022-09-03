@@ -3,8 +3,8 @@
 namespace KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository;
 
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\UserNotFoundException;
+use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
-use KuznetsovVladimir\BlogApi\User\User;
 
 class InMemoryUsersRepository implements UsersRepositoryInterface
 {

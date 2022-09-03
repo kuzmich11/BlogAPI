@@ -3,12 +3,9 @@
 namespace KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository;
 
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\PostNotFoundException;
-use KuznetsovVladimir\BlogApi\Blog\Exceptions\UserNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Post;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\SqliteUsersRepository;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
-use KuznetsovVladimir\BlogApi\User\Name;
-use KuznetsovVladimir\BlogApi\User\User;
 use PDO;
 use PDOStatement;
 
@@ -76,5 +73,15 @@ VALUES (:uuid, :author_uuid, :title, :text)'
             $result['title'],
             $result['text'],
         );
+    }
+
+    public function delete(UUID $uuid): void
+    {
+        $statement = $this->connection->prepare(
+            'DELETE FROM posts WHERE uuid = :uuid'
+        );
+        $statement->execute([
+            ':uuid' => (string)$uuid,
+        ]);
     }
 }

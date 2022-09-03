@@ -6,5 +6,17 @@
         <language minSize="50" name="PHP" />
       </Languages>
     </inspection_tool>
+    <inspection_tool class="IncorrectHttpHeaderInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="customHeaders">
+        <set>
+          <option value="Some-Header" />
+          <option value="&quot;author_uuid&quot;" />
+          <option value="&quot;text&quot;" />
+          <option value="&quot;title&quot;" />
+          <option value="{" />
+          <option value="}" />
+        </set>
+      </option>
+    </inspection_tool>
   </profile>
 </component>

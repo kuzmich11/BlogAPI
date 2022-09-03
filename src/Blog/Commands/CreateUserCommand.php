@@ -5,9 +5,9 @@ namespace KuznetsovVladimir\BlogApi\Blog\Commands;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\CommandException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\UserNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
+use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\User\Name;
-use KuznetsovVladimir\BlogApi\User\User;
 
 
 class CreateUserCommand

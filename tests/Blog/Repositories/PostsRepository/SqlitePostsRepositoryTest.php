@@ -5,9 +5,9 @@ namespace KuznetsovVladimir\BlogApi\Blog\UnitTests\Blog\Repositories\PostsReposi
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\PostNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Post;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\SqlitePostsRepository;
+use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\User\Name;
-use KuznetsovVladimir\BlogApi\User\User;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
