@@ -41,6 +41,9 @@ class Request
         return $data;
     }
 
+    /**
+     * @throws HttpException
+     */
     public function jsonBodyField(string $field): mixed
     {
         $data = $this->jsonBody();
@@ -54,6 +57,9 @@ class Request
     }
 
 
+    /**
+     * @throws HttpException
+     */
     public function path(): string
     {
 
@@ -64,11 +70,14 @@ class Request
         $components = parse_url($this->server['REQUEST_URI']);
         if (!is_array($components) || !array_key_exists('path', $components)) {
 
-            throw new HttpException('Cannot get path from the request');
+            throw new HttpException('Cannot get path');
         }
         return $components['path'];
     }
 
+    /**
+     * @throws HttpException
+     */
     public function query(string $param): string
     {
         if (!array_key_exists($param, $this->get)) {
@@ -85,6 +94,9 @@ class Request
         return $value;
     }
 
+    /**
+     * @throws HttpException
+     */
     public function header(string $header): string
     {
 

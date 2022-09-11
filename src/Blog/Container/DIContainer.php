@@ -3,7 +3,9 @@
 namespace KuznetsovVladimir\BlogApi\Blog\Container;
 
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\NotFoundException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 
 class DIContainer implements ContainerInterface
@@ -15,25 +17,25 @@ class DIContainer implements ContainerInterface
         $this->resolvers[$type] = $resolver;
     }
 
-    public function get(string $type): object
+    public function get(string $id): object
     {
-        if (array_key_exists($type, $this->resolvers)) {
-            $typeToCreate = $this->resolvers[$type];
+        if (array_key_exists($id, $this->resolvers)) {
+            $typeToCreate = $this->resolvers[$id];
             if (is_object($typeToCreate)) {
                 return $typeToCreate;
             }
             return $this->get($typeToCreate);
         }
-        if (!class_exists($type)) {
-            throw new NotFoundException("Cannot resolve type: $type");
+        if (!class_exists($id)) {
+            throw new NotFoundException("Cannot resolve type: $id");
         }
 
-        $reflectionClass = new ReflectionClass($type);
+        $reflectionClass = new ReflectionClass($id);
 
         $constructor = $reflectionClass->getConstructor();
 
         if ($constructor === null) {
-            return new $type();
+            return new $id();
         }
 
         $parameters = [];
@@ -45,13 +47,17 @@ class DIContainer implements ContainerInterface
             $parameters[] = $this->get($parameterType);
         }
 
-        return new $type(...$parameters);
+        return new $id(...$parameters);
     }
 
-    public function has(string $type): bool
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function has(string $id): bool
     {
         try {
-            $this->get($type);
+            $this->get($id);
         } catch (NotFoundException $e) {
             return false;
         }

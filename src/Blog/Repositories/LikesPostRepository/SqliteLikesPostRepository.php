@@ -2,6 +2,7 @@
 
 namespace KuznetsovVladimir\BlogApi\Blog\Repositories\LikesPostRepository;
 
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\InvalidArgumentException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\LikeAlreadyExistsException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\LikeNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\LikePost;
@@ -13,11 +14,13 @@ use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\Http\ErrorResponse;
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class SqliteLikesPostRepository implements LikesPostRepositoryInterface
 {
     public function __construct(
-        private PDO $connection
+        private PDO $connection,
+        private LoggerInterface $logger,
     )
     {
     }
@@ -34,16 +37,21 @@ class SqliteLikesPostRepository implements LikesPostRepositoryInterface
     }
 
 
+    /**
+     * @throws LikeNotFoundException
+     * @throws InvalidArgumentException
+     */
     private function getLike(PDOStatement $statement, string $uuid): LikePost
     {
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if (false === $result) {
+            $this->logger->warning("Like {$uuid} not found");
             throw new LikeNotFoundException(
                 "Cannot find like: $uuid"
             );
         }
-        $usersRepository = new SqliteUsersRepository($this->connection);
-        $postsRepository = new SqlitePostsRepository($this->connection);
+        $usersRepository = new SqliteUsersRepository($this->connection, $this->logger);
+        $postsRepository = new SqlitePostsRepository($this->connection, $this->logger);
         return new LikePost(
             new UUID($result['uuid']),
             $postsRepository->get(new UUID($result['post_uuid'])),
@@ -74,8 +82,13 @@ VALUES (:uuid, :post_uuid, :user_uuid)'
             ':post_uuid' => $like->post()->uuid(),
             ':user_uuid' => $like->user()->uuid(),
         ]);
+
+        $this->logger->info("Like created: {$like->uuid()}");
     }
 
+    /**
+     * @throws LikeAlreadyExistsException
+     */
     public function checkLike(UUID $postUuid, UUID $userUuid)
     {
         $statement = $this->connection->prepare(

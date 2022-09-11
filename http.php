@@ -9,6 +9,9 @@ use KuznetsovVladimir\BlogApi\Http\Actions\Posts\FindPostByUuid;
 use KuznetsovVladimir\BlogApi\Http\Actions\Users\FindUserByUsername;
 use KuznetsovVladimir\BlogApi\Http\ErrorResponse;
 use KuznetsovVladimir\BlogApi\Http\Request;
+use Psr\Log\LoggerInterface;
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\HttpException;
+
 
 $container = require __DIR__ . '/bootstrap.php';
 
@@ -18,17 +21,27 @@ $request = new Request(
     file_get_contents('php://input'),
 );
 
+$logger = $container->get(LoggerInterface::class);
+
 try {
     $path = $request->path();
-} catch (HttpException) {
-    (new ErrorResponse)->send();
+} catch (HttpException $e) {
+    $logger->warning($e->getMessage());
+    try {
+        (new ErrorResponse)->send();
+    } catch (JsonException $e) {
+    }
     return;
 }
 
 try {
     $method = $request->method();
-} catch (HttpException) {
-    (new ErrorResponse)->send();
+} catch (HttpException $e) {
+    $logger->warning($e->getMessage());
+    try {
+        (new ErrorResponse)->send();
+    } catch (JsonException $e) {
+    }
     return;
 }
 
@@ -47,24 +60,27 @@ $routes = [
     ]
 ];
 
-if (!array_key_exists($method, $routes)) {
-    (new ErrorResponse('Not found'))->send();
-    return;
-}
-
-if (!array_key_exists($path, $routes[$method])) {
-    (new ErrorResponse('Not found'))->send();
+if (!array_key_exists($method, $routes) || !array_key_exists($path, $routes[$method])) {
+    $message = "Route not found: $method $path";
+    $logger->notice($message);
+    try {
+        (new ErrorResponse($message))->send();
+    } catch (JsonException $e) {
+    }
     return;
 }
 
 $actionClassName = $routes[$method][$path];
 
-$action = $container->get($actionClassName);
-
 try {
+    $action = $container->get($actionClassName);
     $response = $action->handle($request);
+    $response->send();
 } catch (AppException $e) {
-    (new ErrorResponse($e->getMessage()))->send();
+    $logger->error($e->getMessage(), ['exception' => $e]);
+    try {
+        (new ErrorResponse($e->getMessage()))->send();
+    } catch (JsonException $e) {
+    }
 }
 
-$response->send();
