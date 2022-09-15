@@ -9,6 +9,7 @@ use KuznetsovVladimir\BlogApi\Blog\Exceptions\CommandException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\UserNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\DummyUsersRepository;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
+use KuznetsovVladimir\BlogApi\Blog\UnitTests\logs\DummyLogger;
 use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +18,10 @@ class CreateUserCommandTest extends TestCase
 {
     public function testItThrowsAnExceptionWhenUserAlreadyExists(): void
     {
-        $command = new CreateUserCommand(new DummyUsersRepository());
+        $command = new CreateUserCommand(
+            new DummyUsersRepository(),
+            new DummyLogger()
+        );
 
         $this->expectException(CommandException::class);
         $this->expectExceptionMessage('User already exists: Ivan');
@@ -48,7 +52,10 @@ class CreateUserCommandTest extends TestCase
 
     public function testItRequiresLastName(): void
     {
-        $command = new CreateUserCommand($this->makeUsersRepository());
+        $command = new CreateUserCommand(
+            $this->makeUsersRepository(),
+            new DummyLogger()
+        );
 
         $this->expectException(ArgumentsException::class);
         $this->expectExceptionMessage('No such argument: last_name');
@@ -62,7 +69,10 @@ class CreateUserCommandTest extends TestCase
     public function testItRequiresFirstName(): void
     {
 
-        $command = new CreateUserCommand($this->makeUsersRepository());
+        $command = new CreateUserCommand(
+            $this->makeUsersRepository(),
+            new DummyLogger()
+        );
 
         $this->expectException(ArgumentsException::class);
         $this->expectExceptionMessage('No such argument: first_name');
@@ -99,7 +109,10 @@ class CreateUserCommandTest extends TestCase
             }
         };
 
-        $command = new CreateUserCommand($usersRepository);
+        $command = new CreateUserCommand(
+            $usersRepository,
+            new DummyLogger()
+        );
 
         $command->handle(new Arguments([
             'username' => 'Ivan',

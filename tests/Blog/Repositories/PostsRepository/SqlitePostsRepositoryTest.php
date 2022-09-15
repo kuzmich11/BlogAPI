@@ -5,6 +5,7 @@ namespace KuznetsovVladimir\BlogApi\Blog\UnitTests\Blog\Repositories\PostsReposi
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\PostNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Post;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\SqlitePostsRepository;
+use KuznetsovVladimir\BlogApi\Blog\UnitTests\logs\DummyLogger;
 use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\User\Name;
@@ -31,7 +32,7 @@ class SqlitePostsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $repository = new SqlitePostsRepository($connectionStub);
+        $repository = new SqlitePostsRepository($connectionStub, new DummyLogger());
         $repository->save(
             new Post(
                 new UUID('7b094211-1881-40f4-ac73-365ad0b2b2d4'),
@@ -63,7 +64,7 @@ class SqlitePostsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $postRepository = new SqlitePostsRepository($connectionStub);
+        $postRepository = new SqlitePostsRepository($connectionStub, new DummyLogger());
 
         $post = $postRepository->get(new UUID('7b094211-1881-40f4-ac73-365ad0b2b2d4'));
 
@@ -77,7 +78,7 @@ class SqlitePostsRepositoryTest extends TestCase
             $statementStub = $this->createStub(PDOStatement::class);
             $statementStub->method('fetch')->willReturn(false);
             $connectionStub->method('prepare')->willReturn($statementStub);
-            $repository = new SqlitePostsRepository($connectionStub);
+            $repository = new SqlitePostsRepository($connectionStub, new DummyLogger());
 
             $this->expectException(PostNotFoundException::class);
             $this->expectExceptionMessage('Cannot find post: 7b094211-1881-40f4-ac73-365ad0b2b2d4');

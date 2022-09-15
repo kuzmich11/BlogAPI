@@ -2,17 +2,20 @@
 
 namespace KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository;
 
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\InvalidArgumentException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\UserNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\User\Name;
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class SqliteUsersRepository implements UsersRepositoryInterface
 {
     public function __construct(
-        private PDO $connection
+        private PDO $connection,
+        private LoggerInterface $logger,
     )
     {
     }
@@ -30,6 +33,8 @@ VALUES (:uuid, :username, :first_name, :last_name)'
             ':first_name' => $user->name()->first(),
             ':last_name' => $user->name()->last(),
         ]);
+
+        $this->logger->info("User created: {$user->uuid()}");
     }
 
     public function get(UUID $uuid): User
@@ -54,12 +59,17 @@ VALUES (:uuid, :username, :first_name, :last_name)'
         return $this->getUser($statement, $username);
     }
 
-    private function getUser(PDOStatement $statement, string $username): User
+    /**
+     * @throws InvalidArgumentException
+     * @throws UserNotFoundException
+     */
+    private function getUser(PDOStatement $statement, string $uuid): User
     {
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {
+            $this->logger->warning("User {$uuid} not found");
             throw new UserNotFoundException(
-                "Cannot find user: $username"
+                "Cannot find user: $uuid"
             );
         }
         return new User(

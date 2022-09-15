@@ -2,17 +2,20 @@
 
 namespace KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository;
 
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\InvalidArgumentException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\PostNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Post;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\SqliteUsersRepository;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class SqlitePostsRepository implements PostsRepositoryInterface
 {
     public function __construct(
-        private PDO $connection
+        private PDO $connection,
+        private LoggerInterface $logger,
     )
     {
     }
@@ -30,6 +33,8 @@ VALUES (:uuid, :author_uuid, :title, :text)'
             ':title' => $post->title(),
             ':text' => $post->text(),
         ]);
+
+        $this->logger->info("Post created: {$post->uuid()}");
     }
 
     public function get(UUID $uuid): Post
@@ -57,16 +62,21 @@ VALUES (:uuid, :author_uuid, :title, :text)'
 //        return $this->getPost($statement, $author_uuid);
 //    }
 
-    private function getPost(PDOStatement $statement, string $author_uuid): Post
+    /**
+     * @throws InvalidArgumentException
+     * @throws PostNotFoundException
+     */
+    private function getPost(PDOStatement $statement, string $uuid): Post
     {
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {
+            $this->logger->warning("Post {$uuid} not found");
             throw new PostNotFoundException(
-                "Cannot find post: $author_uuid"
+                "Cannot find post: $uuid"
             );
         }
 
-        $usersRepository = new SqliteUsersRepository($this->connection);
+        $usersRepository = new SqliteUsersRepository($this->connection, $this->logger);
         return new Post(
             new UUID($result['uuid']),
             $usersRepository->get(new UUID($result['author_uuid'])),

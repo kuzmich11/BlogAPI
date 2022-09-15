@@ -6,6 +6,7 @@ use KuznetsovVladimir\BlogApi\Blog\Comment;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\CommentNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Post;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
+use KuznetsovVladimir\BlogApi\Blog\UnitTests\logs\DummyLogger;
 use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\User\Name;
@@ -32,7 +33,7 @@ class SqliteCommentsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
         $repository->save(
             new Comment(
                 new UUID('311b6eb7-00a8-4b64-8ec8-168f8b3463e1'),
@@ -74,7 +75,7 @@ class SqliteCommentsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $commentRepository = new SqliteCommentsRepository($connectionStub);
+        $commentRepository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
 
         $post = $commentRepository->get(new UUID('311b6eb7-00a8-4b64-8ec8-168f8b3463e1'));
 
@@ -89,7 +90,7 @@ class SqliteCommentsRepositoryTest extends TestCase
             $statementStub = $this->createStub(PDOStatement::class);
             $statementStub->method('fetch')->willReturn(false);
             $connectionStub->method('prepare')->willReturn($statementStub);
-            $repository = new SqliteCommentsRepository($connectionStub);
+            $repository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
 
             $this->expectException(CommentNotFoundException::class);
             $this->expectExceptionMessage('Cannot find comment: 7b094211-1881-40f4-ac73-365ad0b2b2d4');

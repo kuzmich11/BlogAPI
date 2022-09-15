@@ -7,6 +7,7 @@ use KuznetsovVladimir\BlogApi\Blog\LikePost;
 use KuznetsovVladimir\BlogApi\Blog\Post;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\LikesPostRepository\SqliteLikesPostRepository;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\SqlitePostsRepository;
+use KuznetsovVladimir\BlogApi\Blog\UnitTests\logs\DummyLogger;
 use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\User\Name;
@@ -32,7 +33,7 @@ class SqliteLikesPostRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $repository = new SqliteLikesPostRepository($connectionStub);
+        $repository = new SqliteLikesPostRepository($connectionStub, new DummyLogger());
         $repository->save(
             new LikePost(
                 new UUID('311b6eb7-00a8-4b64-8ec8-168f8b3463e1'),
@@ -74,7 +75,7 @@ class SqliteLikesPostRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $likePostRepository = new SqliteLikesPostRepository($connectionStub);
+        $likePostRepository = new SqliteLikesPostRepository($connectionStub, new DummyLogger());
 
         $post = $likePostRepository->get(new UUID('7b094211-1881-40f4-ac73-365ad0b2b2d4'));
 
@@ -89,7 +90,7 @@ class SqliteLikesPostRepositoryTest extends TestCase
             $statementStub = $this->createStub(PDOStatement::class);
             $statementStub->method('fetch')->willReturn(false);
             $connectionStub->method('prepare')->willReturn($statementStub);
-            $repository = new SqliteLikesPostRepository($connectionStub);
+            $repository = new SqliteLikesPostRepository($connectionStub, new DummyLogger());
 
             $this->expectException(LikeNotFoundException::class);
             $this->expectExceptionMessage('Cannot find like: 7b094211-1881-40f4-ac73-365ad0b2b2d4');
@@ -118,7 +119,7 @@ class SqliteLikesPostRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $likePostRepository = new SqliteLikesPostRepository($connectionStub);
+        $likePostRepository = new SqliteLikesPostRepository($connectionStub, new DummyLogger());
 
         $post = $likePostRepository->getByPostUuid(new UUID('7b094211-1881-40f4-ac73-365ad0b2b2d4'));
 

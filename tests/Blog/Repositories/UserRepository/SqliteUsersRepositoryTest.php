@@ -4,6 +4,7 @@ namespace KuznetsovVladimir\BlogApi\Blog\UnitTests\Blog\Repositories\UserReposit
 
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\UserNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\SqliteUsersRepository;
+use KuznetsovVladimir\BlogApi\Blog\UnitTests\logs\DummyLogger;
 use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\User\Name;
@@ -31,7 +32,7 @@ class SqliteUsersRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $repository = new SqliteUsersRepository($connectionStub);
+        $repository = new SqliteUsersRepository($connectionStub, new DummyLogger());
         $repository->save(
             new User(
                 new UUID('123e4567-e89b-12d3-a456-426614174000'),
@@ -56,7 +57,7 @@ class SqliteUsersRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $userRepository = new SqliteUsersRepository($connectionStub);
+        $userRepository = new SqliteUsersRepository($connectionStub, new DummyLogger());
 
         $post = $userRepository->get(new UUID('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'));
 
@@ -78,7 +79,7 @@ class SqliteUsersRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $userRepository = new SqliteUsersRepository($connectionStub);
+        $userRepository = new SqliteUsersRepository($connectionStub, new DummyLogger());
 
         $post = $userRepository->getByUsername('ivan123');
 
@@ -93,7 +94,7 @@ class SqliteUsersRepositoryTest extends TestCase
         $statementStub = $this->createStub(PDOStatement::class);
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
-        $repository = new SqliteUsersRepository($connectionStub);
+        $repository = new SqliteUsersRepository($connectionStub, new DummyLogger());
 
         $this->expectException(UserNotFoundException::class);
         $this->expectExceptionMessage('Cannot find user: Ivan');
