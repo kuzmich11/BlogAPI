@@ -40,6 +40,7 @@ class CreateCommentTest extends TestCase
         $usersRepository = $this->usersRepository([new User (
             new UUID('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'),
             'ivan',
+            '123456',
             new Name('Ivan', 'Nikitin')
         )]);
 
@@ -48,6 +49,7 @@ class CreateCommentTest extends TestCase
             new User(
                 new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
                 'ivan2',
+                '123456',
                 new Name('Ivan', 'Nikitin')
             ),
             'Заголовок',

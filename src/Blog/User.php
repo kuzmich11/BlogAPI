@@ -7,37 +7,61 @@ use KuznetsovVladimir\BlogApi\User\Name;
 
 class User
 {
-    private UUID $uuid;
-    private string $username;
-    private Name $name;
+
 
     /**
      * @param UUID $uuid
      * @param Name $name
+     * @param string $hashedPassword
      * @param string $username
      */
-    public function __construct(UUID $uuid, string $username, Name $name)
+    public function __construct(
+        private UUID   $uuid,
+        private string $username,
+        private string $hashedPassword,
+        private Name   $name,
+    )
     {
-        $this->uuid = $uuid;
-        $this->name = $name;
-        $this->username = $username;
     }
 
+    public function hashedPassword(): string
+    {
+        return $this->hashedPassword;
+    }
 
-    /**
-     * @return UUID $uuid
-     */
+    private static function hash(string $password, UUID $uuid): string
+    {
+        return hash('sha256', $uuid . $password);
+    }
+
+    public function checkPassword(string $password): bool
+    {
+        return $this->hashedPassword === self::hash($password, $this->uuid);
+    }
+
+    public static function createFrom(
+        string $username,
+        string $password,
+        Name   $name
+    ): self
+    {
+        $uuid = UUID::random();
+        return new self(
+            $uuid,
+            $username,
+            self::hash($password, $uuid),
+            $name
+        );
+    }
+
+    public function username(): string
+    {
+        return $this->username;
+    }
+
     public function uuid(): UUID
     {
         return $this->uuid;
-    }
-
-    /**
-     * @param UUID $uuid
-     */
-    public function setUuid(UUID $uuid): void
-    {
-        $this->uuid = $uuid;
     }
 
     /**
@@ -49,32 +73,12 @@ class User
     }
 
     /**
-     * @param Name $name
-     */
-    public function setName(Name $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
      * @return string
      */
-    public function username(): string
+    public function __toString(): string
     {
-        return $this->username;
+        return (string)$this->name;
     }
 
-    /**
-     * @param string $username
-     */
-    public function setUsername(string $username): void
-    {
-        $this->username = $username;
-    }
-
-    public function __toString()
-    {
-        return $this->name . ' c логином ' . $this->username;
-    }
 
 }

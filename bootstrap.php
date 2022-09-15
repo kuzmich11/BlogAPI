@@ -1,14 +1,21 @@
 <?php
 
 use KuznetsovVladimir\BlogApi\Blog\Container\DIContainer;
+use KuznetsovVladimir\BlogApi\Blog\Repositories\AuthTokensRepository\AuthTokensRepositoryInterface;
+use KuznetsovVladimir\BlogApi\Blog\Repositories\AuthTokensRepository\SqliteAuthTokensRepository;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\LikesPostRepository\LikesPostRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\LikesPostRepository\SqliteLikesPostRepository;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\SqlitePostsRepository;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\SqliteUsersRepository;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
+use KuznetsovVladimir\BlogApi\Http\Auth\AuthenticationInterface;
+use KuznetsovVladimir\BlogApi\Http\Auth\BearerTokenAuthentication;
 use KuznetsovVladimir\BlogApi\Http\Auth\IdentificationInterface;
 use KuznetsovVladimir\BlogApi\Http\Auth\JsonBodyUuidIdentification;
+use KuznetsovVladimir\BlogApi\Http\Auth\PasswordAuthentication;
+use KuznetsovVladimir\BlogApi\Http\Auth\PasswordAuthenticationInterface;
+use KuznetsovVladimir\BlogApi\Http\Auth\TokenAuthenticationInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -20,14 +27,34 @@ require_once __DIR__ . '/vendor/autoload.php';
 $container = new DIContainer();
 
 $container->bind(
+    PasswordAuthenticationInterface::class,
+    PasswordAuthentication::class
+);
+
+$container->bind(
+    TokenAuthenticationInterface::class,
+    BearerTokenAuthentication::class
+);
+
+$container->bind(
+    AuthTokensRepositoryInterface::class,
+    SqliteAuthTokensRepository::class
+);
+
+$container->bind(
     PDO::class,
     new PDO('sqlite:' . __DIR__ . $_ENV['SQLITE_DB_PATH'])
 );
 
 $container->bind(
-    IdentificationInterface::class,
-    JsonBodyUuidIdentification::class
+    AuthenticationInterface::class,
+    PasswordAuthentication::class
 );
+
+//$container->bind(
+//    IdentificationInterface::class,
+//    JsonBodyUuidIdentification::class
+//);
 
 $container->bind(
     PostsRepositoryInterface::class,

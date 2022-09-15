@@ -14,6 +14,7 @@ class UserTest extends TestCase
         return new User(
             new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
             'admin',
+            '123456',
             new Name('Ivan', 'Ivanov')
         );
     }
@@ -55,34 +56,34 @@ class UserTest extends TestCase
         $this->assertIsString($value);
     }
 
-    public function testItSetUuid(): void
-    {
-        $user = $this->getCreateUser();
-
-        $user->setUuid(new UUID('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'));
-        $value = $user->Uuid();
-
-        $this->assertEquals('38830eb6-d2cf-44f9-a7dd-5e7d634eac77', $value);
-    }
-
-    public function testItSetUsername(): void
-    {
-        $user = $this->getCreateUser();
-
-        $user->setUsername('user');
-        $value = $user->username();
-
-        $this->assertEquals('user', $value);
-    }
-
-    public function testItSetName(): void
-    {
-        $user = $this->getCreateUser();
-
-        $user->setName(new Name('Petr', 'Petrov'));
-        $value = $user->name();
-        $name = new Name('Petr', 'Petrov');
-
-        $this->assertEquals($name, $value);
-    }
+//    public function testItSetUuid(): void
+//    {
+//        $user = $this->getCreateUser();
+//
+//        $user->setUuid(new UUID('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'));
+//        $value = $user->Uuid();
+//
+//        $this->assertEquals('38830eb6-d2cf-44f9-a7dd-5e7d634eac77', $value);
+//    }
+//
+//    public function testItSetUsername(): void
+//    {
+//        $user = $this->getCreateUser();
+//
+//        $user->setUsername('user');
+//        $value = $user->username();
+//
+//        $this->assertEquals('user', $value);
+//    }
+//
+//    public function testItSetName(): void
+//    {
+//        $user = $this->getCreateUser();
+//
+//        $user->setName(new Name('Petr', 'Petrov'));
+//        $value = $user->name();
+//        $name = new Name('Petr', 'Petrov');
+//
+//        $this->assertEquals($name, $value);
+//    }
 }

@@ -16,6 +16,20 @@ use PHPUnit\Framework\TestCase;
 
 class CreateUserCommandTest extends TestCase
 {
+
+    public function testItRequiresPassword(): void
+    {
+        $command = new CreateUserCommand(
+            $this->makeUsersRepository(),
+            new DummyLogger()
+        );
+        $this->expectException(ArgumentsException::class);
+        $this->expectExceptionMessage('No such argument: password');
+        $command->handle(new Arguments([
+            'username' => 'Ivan',
+        ]));
+    }
+
     public function testItThrowsAnExceptionWhenUserAlreadyExists(): void
     {
         $command = new CreateUserCommand(
@@ -26,7 +40,10 @@ class CreateUserCommandTest extends TestCase
         $this->expectException(CommandException::class);
         $this->expectExceptionMessage('User already exists: Ivan');
 
-        $command->handle(new Arguments(['username' => 'Ivan']));
+        $command->handle(new Arguments([
+            'username' => 'Ivan',
+            'password' => '123456'
+        ]));
     }
 
     private function makeUsersRepository(): UsersRepositoryInterface
@@ -62,6 +79,7 @@ class CreateUserCommandTest extends TestCase
 
         $command->handle(new Arguments([
             'username' => 'Ivan',
+            'password' => '123',
             'first_name' => 'Ivan',
         ]));
     }
@@ -77,7 +95,10 @@ class CreateUserCommandTest extends TestCase
         $this->expectException(ArgumentsException::class);
         $this->expectExceptionMessage('No such argument: first_name');
 
-        $command->handle(new Arguments(['username' => 'Ivan']));
+        $command->handle(new Arguments([
+            'username' => 'Ivan',
+            'password' => '123',
+            ]));
     }
 
     public function testItSavesUserToRepository(): void
@@ -116,6 +137,7 @@ class CreateUserCommandTest extends TestCase
 
         $command->handle(new Arguments([
             'username' => 'Ivan',
+            'password' => '123',
             'first_name' => 'Ivan',
             'last_name' => 'Nikitin',
         ]));

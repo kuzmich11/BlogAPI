@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 class SqliteUsersRepository implements UsersRepositoryInterface
 {
     public function __construct(
-        private PDO $connection,
+        private PDO             $connection,
         private LoggerInterface $logger,
     )
     {
@@ -24,12 +24,13 @@ class SqliteUsersRepository implements UsersRepositoryInterface
     {
 
         $statement = $this->connection->prepare(
-            'INSERT INTO users (uuid, username, first_name, last_name)
-VALUES (:uuid, :username, :first_name, :last_name)'
+            'INSERT INTO users (uuid, username, password, first_name, last_name)
+VALUES (:uuid, :username, :password, :first_name, :last_name)'
         );
         $statement->execute([
             ':uuid' => (string)$user->uuid(),
             ':username' => $user->username(),
+            ':password' => $user->hashedPassword(),
             ':first_name' => $user->name()->first(),
             ':last_name' => $user->name()->last(),
         ]);
@@ -37,6 +38,10 @@ VALUES (:uuid, :username, :first_name, :last_name)'
         $this->logger->info("User created: {$user->uuid()}");
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws UserNotFoundException
+     */
     public function get(UUID $uuid): User
     {
         $statement = $this->connection->prepare(
@@ -75,6 +80,7 @@ VALUES (:uuid, :username, :first_name, :last_name)'
         return new User(
             new UUID($result['uuid']),
             $result['username'],
+            $result['password'],
             new Name($result['first_name'], $result['last_name'])
         );
     }

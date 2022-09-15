@@ -2,17 +2,21 @@
 
 namespace KuznetsovVladimir\BlogApi\Blog\UnitTests\Http\Actions\LikesPost;
 
+use DateTimeImmutable;
+use KuznetsovVladimir\BlogApi\Blog\AuthToken;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\LikeNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\PostNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\UserNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\LikePost;
 use KuznetsovVladimir\BlogApi\Blog\Post;
+use KuznetsovVladimir\BlogApi\Blog\Repositories\AuthTokensRepository\AuthTokensRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\LikesPostRepository\LikesPostRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\Http\Actions\LikesPost\CreateLikePost;
+use KuznetsovVladimir\BlogApi\Http\Auth\TokenAuthenticationInterface;
 use KuznetsovVladimir\BlogApi\Http\ErrorResponse;
 use KuznetsovVladimir\BlogApi\Http\Request;
 use KuznetsovVladimir\BlogApi\Http\SuccessfulResponse;
@@ -29,9 +33,8 @@ class CreateLikePostTest extends TestCase
     {
         $request = new Request(
             [],
-            [],
+            ["HTTP_AUTHORIZATION"=>"123456"],
             '{
-            "user_uuid": "38830eb6-d2cf-44f9-a7dd-5e7d634eac77",
             "post_uuid": "52763e12-b5b8-4d17-961b-334bbc2fa686"
             }'
         );
@@ -39,6 +42,7 @@ class CreateLikePostTest extends TestCase
         $usersRepository = $this->usersRepository([new User (
             new UUID('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'),
             'ivan',
+            '123456',
             new Name('Ivan', 'Nikitin')
         )]);
 
@@ -47,6 +51,7 @@ class CreateLikePostTest extends TestCase
             new User(
                 new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
                 'ivan2',
+                '123456',
                 new Name('Ivan', 'Nikitin')
             ),
             'Заголовок',
@@ -55,7 +60,15 @@ class CreateLikePostTest extends TestCase
 
         $likesPostRepository = $this->likesPostRepository([]);
 
-        $action = new CreateLikePost($likesPostRepository, $postsRepository, $usersRepository);
+        $authTokensRepository = $this->authTokensRepository([
+            '123456',
+            new UUID ('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'),
+            new DateTimeImmutable()
+        ]);
+
+        $tokenAuthentication = $this->tokenAuthentication($authTokensRepository, $usersRepository);
+
+        $action = new CreateLikePost($likesPostRepository, $postsRepository, $tokenAuthentication);
         $response = $action->handle($request);
 
         $this->assertInstanceOf(SuccessfulResponse::class, $response);
@@ -74,22 +87,34 @@ class CreateLikePostTest extends TestCase
             [],
             [],
             '{
-            "user_uuid": "38830eb6-d2cf-44f9-a7dd-5e7d634eac7",
-            "post_uuid": "52763e12-b5b8-4d17-961b-334bbc2fa686"
+            "post_uuid": "52763e12-b5b8-4d17-961b-334bbc2fa68"
             }'
         );
-        $usersRepository = $this->usersRepository([]);
+        $usersRepository = $this->usersRepository([new User (
+            new UUID('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'),
+            'ivan',
+            '123456',
+            new Name('Ivan', 'Nikitin')
+        )]);
 
         $postsRepository = $this->postsRepository([]);
 
         $likesPostRepository = $this->likesPostRepository([]);
 
-        $action = new CreateLikePost($likesPostRepository, $postsRepository, $usersRepository);
+        $authTokensRepository = $this->authTokensRepository([
+            '123456',
+            new UUID ('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'),
+            new DateTimeImmutable()
+        ]);
+
+        $tokenAuthentication = $this->tokenAuthentication($authTokensRepository, $usersRepository);
+
+        $action = new CreateLikePost($likesPostRepository, $postsRepository, $tokenAuthentication);
         $response = $action->handle($request);
 
         $this->assertInstanceOf(ErrorResponse::class, $response);
         $this->expectOutputString(
-            "{\"success\":false,\"reason\":\"Malformed UUID: 38830eb6-d2cf-44f9-a7dd-5e7d634eac7\"}");
+            "{\"success\":false,\"reason\":\"Malformed UUID: 52763e12-b5b8-4d17-961b-334bbc2fa68\"}");
 
         $response->send();
     }
@@ -98,32 +123,7 @@ class CreateLikePostTest extends TestCase
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function testItReturnErrorIFUserNotFound(): void
-    {
-        $request = new Request(
-            [],
-            [],
-            '{
-            "user_uuid": "38830eb6-d2cf-44f9-a7dd-5e7d634eac77",
-            "post_uuid": "52763e12-b5b8-4d17-961b-334bbc2fa686",
-            "text": "TEXT"
-            }'
-        );
-        $usersRepository = $this->usersRepository([]);
 
-        $postsRepository = $this->postsRepository([]);
-
-        $likesPostRepository = $this->likesPostRepository([]);
-
-        $action = new CreateLikePost($likesPostRepository, $postsRepository, $usersRepository);
-        $response = $action->handle($request);
-
-        $this->assertInstanceOf(ErrorResponse::class, $response);
-        $this->expectOutputString(
-            "{\"success\":false,\"reason\":\"User not found\"}");
-
-        $response->send();
-    }
 
     /**
      * @runInSeparateProcess
@@ -137,18 +137,31 @@ class CreateLikePostTest extends TestCase
             '{
             }'
         );
-        $usersRepository = $this->usersRepository([]);
+        $usersRepository = $this->usersRepository([new User (
+            new UUID('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'),
+            'ivan',
+            '123456',
+            new Name('Ivan', 'Nikitin'))
+        ]);
 
         $postsRepository = $this->postsRepository([]);
 
         $likesPostRepository = $this->likesPostRepository([]);
 
-        $action = new CreateLikePost($likesPostRepository, $postsRepository, $usersRepository);
+        $authTokensRepository = $this->authTokensRepository([
+            '123456',
+            new UUID ('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'),
+            new DateTimeImmutable()
+        ]);
+
+        $tokenAuthentication = $this->tokenAuthentication($authTokensRepository, $usersRepository);
+
+        $action = new CreateLikePost($likesPostRepository, $postsRepository, $tokenAuthentication);
         $response = $action->handle($request);
 
         $this->assertInstanceOf(ErrorResponse::class, $response);
         $this->expectOutputString(
-            "{\"success\":false,\"reason\":\"No such field: user_uuid\"}");
+            "{\"success\":false,\"reason\":\"No such field: post_uuid\"}");
 
         $response->send();
     }
@@ -185,7 +198,7 @@ class CreateLikePostTest extends TestCase
             {
                 throw new LikeNotFoundException("Not found");
             }
-            public function checkLike(UUID $postUuid, UUID $userUuid) {
+            public function checkLike(UUID $postUuid, string $userUuid) {
 
             }
         };
@@ -211,12 +224,12 @@ class CreateLikePostTest extends TestCase
                         return $user;
                     }
                 }
-                throw new UserNotFoundException("Not found");
+                throw new UserNotFoundException("User not found");
             }
 
             public function getByUsername(string $username): User
             {
-                throw new UserNotFoundException("Not found");
+                throw new UserNotFoundException("User not found");
             }
         };
     }
@@ -248,6 +261,49 @@ class CreateLikePostTest extends TestCase
             {
             }
 
+        };
+    }
+
+    private function tokenAuthentication($authTokensRepository, $usersRepository): TokenAuthenticationInterface
+    {
+        return new class ($authTokensRepository, $usersRepository) implements TokenAuthenticationInterface
+        {
+            public function __construct(
+                private $authTokensRepository,
+                private $userRepository
+            ) {
+            }
+
+            public function user(Request $request): User
+            {
+                return $this->userRepository->get(new UUID('38830eb6-d2cf-44f9-a7dd-5e7d634eac77'));
+            }
+        };
+    }
+
+    private function authTokensRepository(array $array): AuthTokensRepositoryInterface
+    {
+        return new class ($array) implements AuthTokensRepositoryInterface
+        {
+            public function __construct(
+                private array $array
+            ) {
+            }
+
+            public function save(AuthToken $authToken): void
+            {
+            }
+
+            public function get(string $token): AuthToken
+            {
+                foreach ($this->array as $authToken) {
+                    if ($authToken instanceof AuthToken && $token == $authToken->token())
+                    {
+                        return $authToken;
+                    }
+                }
+                throw new PostNotFoundException("Not found");
+            }
         };
     }
 }

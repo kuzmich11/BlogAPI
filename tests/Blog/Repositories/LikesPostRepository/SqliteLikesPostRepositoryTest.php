@@ -42,6 +42,7 @@ class SqliteLikesPostRepositoryTest extends TestCase
                     new User(
                         new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
                         'ivan123',
+                        '123456',
                         new Name('Ivan', 'Nikitin')
                     ),
                     'Заголовок',
@@ -50,6 +51,7 @@ class SqliteLikesPostRepositoryTest extends TestCase
                 new User(
                     new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
                     'ivan123',
+                    '123456',
                     new Name('Ivan', 'Nikitin')
                 ),
             ));
@@ -71,6 +73,7 @@ class SqliteLikesPostRepositoryTest extends TestCase
             'username' => 'ivan123',
             'first_name' => 'Ivan',
             'last_name' => 'Nikitin',
+            'password' => '123456',
         ]);
 
         $connectionStub->method('prepare')->willReturn($statementMock);
@@ -115,6 +118,7 @@ class SqliteLikesPostRepositoryTest extends TestCase
             'username' => 'ivan123',
             'first_name' => 'Ivan',
             'last_name' => 'Nikitin',
+            'password' => '123456',
         ]);
 
         $connectionStub->method('prepare')->willReturn($statementMock);
