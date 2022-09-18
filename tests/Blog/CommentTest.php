@@ -18,6 +18,7 @@ class CommentTest extends TestCase
             new User(
                 new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
                 'admin',
+                '123456',
                 new Name('Ivan', 'Ivanov')
             ),
             new Post(
@@ -25,6 +26,7 @@ class CommentTest extends TestCase
                 new User(
                     new UUID('c2c2b504-dfad-46ba-ba7c-a21558325d50'),
                     'user',
+                    '123456',
                     new Name('Petr', 'petrov')
                 ),
                 'Заголовок',
@@ -51,6 +53,7 @@ class CommentTest extends TestCase
         $user = new User(
             new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
             'admin',
+            '123456',
             new Name('Ivan', 'Ivanov')
         );
 
@@ -67,6 +70,7 @@ class CommentTest extends TestCase
             new User(
                 new UUID('c2c2b504-dfad-46ba-ba7c-a21558325d50'),
                 'user',
+                '123456',
                 new Name('Petr', 'petrov')
             ),
             'Заголовок',
@@ -112,12 +116,14 @@ class CommentTest extends TestCase
             new User(
             new UUID('36086b79-11a7-4962-8b09-a880651f0f58'),
             'user',
+                '123456',
             new Name('Petr', 'Petrov')
         ));
         $value = $comment->user();
         $user = new User(
             new UUID('36086b79-11a7-4962-8b09-a880651f0f58'),
             'user',
+            '123456',
             new Name('Petr', 'Petrov')
         );
 
@@ -134,6 +140,7 @@ class CommentTest extends TestCase
                 new User(
                     new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
                     'admin',
+                    '123456',
                     new Name('Ivan', 'Ivanov')
                 ),
                 'Новый заголовок',
@@ -145,6 +152,7 @@ class CommentTest extends TestCase
             new User(
                 new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
                 'admin',
+                '123456',
                 new Name('Ivan', 'Ivanov')
             ),
             'Новый заголовок',

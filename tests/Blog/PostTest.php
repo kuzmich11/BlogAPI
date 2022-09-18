@@ -17,6 +17,7 @@ class PostTest extends TestCase
             new User(
                 new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
                 'admin',
+                '123456',
                 new Name('Ivan', 'Ivanov')
             ),
             'Заголовок',
@@ -41,6 +42,7 @@ class PostTest extends TestCase
         $user = new User(
             new UUID('5a91ed7a-0ae4-495f-b666-c52bc8f13fe4'),
             'admin',
+            '123456',
             new Name('Ivan', 'Ivanov')
         );
 
@@ -91,12 +93,14 @@ class PostTest extends TestCase
         $post->setUser(new User(
             new UUID('e04e341e-2052-41b1-b929-d911e0cbe6f0'),
             'user',
+            '123456',
             new Name('Petr', 'Petrov')
         ));
         $value = $post->user();
         $user = new User(
             new UUID('e04e341e-2052-41b1-b929-d911e0cbe6f0'),
             'user',
+            '123456',
             new Name('Petr', 'Petrov')
         );
 

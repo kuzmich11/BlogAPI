@@ -89,14 +89,14 @@ VALUES (:uuid, :post_uuid, :user_uuid)'
     /**
      * @throws LikeAlreadyExistsException
      */
-    public function checkLike(UUID $postUuid, UUID $userUuid)
+    public function checkLike(UUID $postUuid, string $userUuid)
     {
         $statement = $this->connection->prepare(
             'SELECT * FROM postLikes WHERE post_uuid = :post_uuid AND user_uuid = :user_uuid'
         );
         $statement->execute([
             ':post_uuid' => $postUuid->uuid(),
-            ':user_uuid' => $userUuid->uuid()
+            ':user_uuid' => $userUuid
         ]);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {

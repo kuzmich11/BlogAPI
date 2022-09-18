@@ -26,6 +26,7 @@ class SqliteUsersRepositoryTest extends TestCase
             ->with([ // с единственным аргументом - массивом
                 ':uuid' => '123e4567-e89b-12d3-a456-426614174000',
                 ':username' => 'ivan123',
+                ':password' => '123456',
                 ':first_name' => 'Ivan',
                 ':last_name' => 'Nikitin',
             ]);
@@ -37,6 +38,7 @@ class SqliteUsersRepositoryTest extends TestCase
             new User(
                 new UUID('123e4567-e89b-12d3-a456-426614174000'),
                 'ivan123',
+                '123456',
                 new Name('Ivan', 'Nikitin')
             )
         );
@@ -51,6 +53,7 @@ class SqliteUsersRepositoryTest extends TestCase
         $statementMock->method('fetch')->willReturn([
             'uuid' => '38830eb6-d2cf-44f9-a7dd-5e7d634eac77',
             'username' => 'ivan123',
+            'password' => '123456',
             'first_name' => 'Ivan',
             'last_name' => 'Nikitin',
         ]);
@@ -73,6 +76,7 @@ class SqliteUsersRepositoryTest extends TestCase
         $statementMock->method('fetch')->willReturn([
             'uuid' => '38830eb6-d2cf-44f9-a7dd-5e7d634eac77',
             'username' => 'ivan123',
+            'password' => '123456',
             'first_name' => 'Ivan',
             'last_name' => 'Nikitin',
         ]);

@@ -2,6 +2,7 @@
 
 namespace KuznetsovVladimir\BlogApi\Http\Actions\LikesPost;
 
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\AuthException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\HttpException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\InvalidArgumentException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\LikeAlreadyExistsException;
@@ -13,6 +14,7 @@ use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\PostsRepositoryI
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\Http\Actions\ActionInterface;
+use KuznetsovVladimir\BlogApi\Http\Auth\TokenAuthenticationInterface;
 use KuznetsovVladimir\BlogApi\Http\Request;
 use KuznetsovVladimir\BlogApi\Http\Response;
 use KuznetsovVladimir\BlogApi\Http\ErrorResponse;
@@ -23,22 +25,16 @@ class CreateLikePost implements ActionInterface
     public function __construct(
         private LikesPostRepositoryInterface $likesPostRepository,
         private PostsRepositoryInterface $postsRepository,
-        private UsersRepositoryInterface $usersRepository,
+        private TokenAuthenticationInterface $authentication,
     ) {
     }
     public function handle(Request $request): Response
     {
 
         try {
-            $userUuid = new UUID($request->jsonBodyField('user_uuid'));
-        } catch (HttpException | InvalidArgumentException $e) {
+            $author = $this->authentication->user($request);
+        } catch (AuthException $e) {
             return new ErrorResponse($e->getMessage());
-        }
-
-        try {
-            $this->usersRepository->get($userUuid);
-        } catch (UserNotFoundException $e) {
-            return new ErrorResponse('User not found');
         }
 
         try {
@@ -59,14 +55,14 @@ class CreateLikePost implements ActionInterface
             $like = new LikePost(
                 $newLikeUuid,
                 $this->postsRepository->get($postUuid),
-                $this->usersRepository->get($userUuid),
+                $author,
             );
         } catch (HttpException $e) {
             return new ErrorResponse($e->getMessage());
         }
 
         try {
-            $this->likesPostRepository->checkLike($postUuid, $userUuid);
+            $this->likesPostRepository->checkLike($postUuid, $author);
         } catch (LikeAlreadyExistsException $e) {
             return new ErrorResponse($e->getMessage());
         }

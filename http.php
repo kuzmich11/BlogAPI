@@ -1,6 +1,8 @@
 <?php
 
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\AppException;
+use KuznetsovVladimir\BlogApi\Http\Actions\Auth\LogIn;
+use KuznetsovVladimir\BlogApi\Http\Actions\Auth\Logout;
 use KuznetsovVladimir\BlogApi\Http\Actions\Comments\CreateComment;
 use KuznetsovVladimir\BlogApi\Http\Actions\LikesPost\CreateLikePost;
 use KuznetsovVladimir\BlogApi\Http\Actions\Posts\CreatePost;
@@ -49,8 +51,10 @@ $routes = [
     'GET' => [
         '/users/show' => FindUserByUsername::class,
         '/posts/show' => FindPostByUuid::class,
+        '/logout' => Logout::class
     ],
     'POST' => [
+        '/login' => LogIn::class,
         '/posts/create' => CreatePost::class,
         '/posts/comment' => CreateComment::class,
         '/posts/like' => CreateLikePost::class

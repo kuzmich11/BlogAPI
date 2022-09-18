@@ -2,12 +2,13 @@
 
 namespace KuznetsovVladimir\BlogApi\Http\Actions\Posts;
 
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\AuthException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\HttpException;
 use KuznetsovVladimir\BlogApi\Blog\Post;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use KuznetsovVladimir\BlogApi\Http\Actions\ActionInterface;
-use KuznetsovVladimir\BlogApi\Http\Auth\IdentificationInterface;
+use KuznetsovVladimir\BlogApi\Http\Auth\TokenAuthenticationInterface;
 use KuznetsovVladimir\BlogApi\Http\Request;
 use KuznetsovVladimir\BlogApi\Http\Response;
 use KuznetsovVladimir\BlogApi\Http\ErrorResponse;
@@ -19,14 +20,17 @@ class CreatePost implements ActionInterface
 
     public function __construct(
         private PostsRepositoryInterface $postsRepository,
-        private IdentificationInterface $identification,
+        private TokenAuthenticationInterface $authentication,
         private LoggerInterface $logger,
     ) {
     }
     public function handle(Request $request): Response
     {
-
-        $author = $this->identification->user($request);
+        try {
+            $author = $this->authentication->user($request);
+        } catch (AuthException $e) {
+            return new ErrorResponse($e->getMessage());
+        }
 
         $newPostUuid = UUID::random();
         try {
