@@ -4,10 +4,13 @@ namespace KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository;
 
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\InvalidArgumentException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\PostNotFoundException;
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\PostsRepositoryException;
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\UserNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Post;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\SqliteUsersRepository;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
 use PDO;
+use PDOException;
 use PDOStatement;
 use Psr\Log\LoggerInterface;
 
@@ -37,6 +40,11 @@ VALUES (:uuid, :author_uuid, :title, :text)'
         $this->logger->info("Post created: {$post->uuid()}");
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws PostNotFoundException
+     * @throws UserNotFoundException
+     */
     public function get(UUID $uuid): Post
     {
         $statement = $this->connection->prepare(
@@ -62,8 +70,10 @@ VALUES (:uuid, :author_uuid, :title, :text)'
 //        return $this->getPost($statement, $author_uuid);
 //    }
 
+
     /**
      * @throws InvalidArgumentException
+     * @throws UserNotFoundException
      * @throws PostNotFoundException
      */
     private function getPost(PDOStatement $statement, string $uuid): Post
@@ -85,13 +95,23 @@ VALUES (:uuid, :author_uuid, :title, :text)'
         );
     }
 
+    /**
+     * @throws PostsRepositoryException
+     */
     public function delete(UUID $uuid): void
     {
-        $statement = $this->connection->prepare(
-            'DELETE FROM posts WHERE uuid = :uuid'
-        );
-        $statement->execute([
-            ':uuid' => (string)$uuid,
-        ]);
+        try {
+            $statement = $this->connection->prepare(
+                'DELETE FROM posts WHERE uuid = :uuid'
+            );
+            $statement->execute([
+                ':uuid' => (string)$uuid,
+            ]);
+        } catch (PDOException $e) {
+            throw new PostsRepositoryException(
+                $e->getMessage(), (int)$e->getCode(), $e
+            );
+        }
+
     }
 }
