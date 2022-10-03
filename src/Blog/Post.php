@@ -2,7 +2,7 @@
 
 namespace KuznetsovVladimir\BlogApi\Blog;
 
-class Post
+class Post extends \KuznetsovVladimir\BlogApi\Blog\Comment
 {
 
     public function __construct(

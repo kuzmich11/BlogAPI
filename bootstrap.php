@@ -1,8 +1,11 @@
 <?php
 
+use Dotenv\Dotenv;
 use KuznetsovVladimir\BlogApi\Blog\Container\DIContainer;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\AuthTokensRepository\AuthTokensRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\AuthTokensRepository\SqliteAuthTokensRepository;
+use KuznetsovVladimir\BlogApi\Blog\Repositories\CommentsRepository\CommentsRepositoryInterface;
+use KuznetsovVladimir\BlogApi\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\LikesPostRepository\LikesPostRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\LikesPostRepository\SqliteLikesPostRepository;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
@@ -11,20 +14,34 @@ use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\SqliteUsersRepos
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Http\Auth\AuthenticationInterface;
 use KuznetsovVladimir\BlogApi\Http\Auth\BearerTokenAuthentication;
-use KuznetsovVladimir\BlogApi\Http\Auth\IdentificationInterface;
-use KuznetsovVladimir\BlogApi\Http\Auth\JsonBodyUuidIdentification;
 use KuznetsovVladimir\BlogApi\Http\Auth\PasswordAuthentication;
 use KuznetsovVladimir\BlogApi\Http\Auth\PasswordAuthenticationInterface;
 use KuznetsovVladimir\BlogApi\Http\Auth\TokenAuthenticationInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Faker\Provider\Lorem;
+use Faker\Provider\ru_RU\Internet;
+use Faker\Provider\ru_RU\Person;
+use Faker\Provider\ru_RU\Text;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-\Dotenv\Dotenv::createImmutable(__DIR__)->safeLoad();
+Dotenv::createImmutable(__DIR__)->safeLoad();
 
 $container = new DIContainer();
+
+$faker = new \Faker\Generator();
+
+$faker->addProvider(new Person($faker));
+$faker->addProvider(new Text($faker));
+$faker->addProvider(new Internet($faker));
+$faker->addProvider(new Lorem($faker));
+
+$container->bind(
+    \Faker\Generator::class,
+    $faker
+);
 
 $container->bind(
     PasswordAuthenticationInterface::class,
@@ -51,10 +68,6 @@ $container->bind(
     PasswordAuthentication::class
 );
 
-//$container->bind(
-//    IdentificationInterface::class,
-//    JsonBodyUuidIdentification::class
-//);
 
 $container->bind(
     PostsRepositoryInterface::class,
@@ -64,6 +77,11 @@ $container->bind(
 $container->bind(
     UsersRepositoryInterface::class,
     SqliteUsersRepository::class
+);
+
+$container->bind(
+    CommentsRepositoryInterface::class,
+    SqliteCommentsRepository::class
 );
 
 $container->bind(

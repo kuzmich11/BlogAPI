@@ -2,6 +2,8 @@
 
 namespace KuznetsovVladimir\BlogApi\Blog\Commands;
 
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\ArgumentsException;
+use KuznetsovVladimir\BlogApi\Blog\Exceptions\InvalidArgumentException;
 use KuznetsovVladimir\BlogApi\Blog\Post;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
@@ -16,6 +18,10 @@ class CreatePostCommand
     {
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws ArgumentsException
+     */
     public function handle(Arguments $arguments): void
     {
 
