@@ -7,8 +7,9 @@ use KuznetsovVladimir\BlogApi\Blog\Exceptions\PostNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\PostsRepositoryException;
 use KuznetsovVladimir\BlogApi\Blog\Exceptions\UserNotFoundException;
 use KuznetsovVladimir\BlogApi\Blog\Post;
-use KuznetsovVladimir\BlogApi\Blog\Repositories\UsersRepository\SqliteUsersRepository;
+use KuznetsovVladimir\BlogApi\Blog\User;
 use KuznetsovVladimir\BlogApi\Blog\UUID;
+use KuznetsovVladimir\BlogApi\User\Name;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -48,7 +49,7 @@ VALUES (:uuid, :author_uuid, :title, :text)'
     public function get(UUID $uuid): Post
     {
         $statement = $this->connection->prepare(
-            'SELECT * FROM posts WHERE uuid = :uuid'
+            'SELECT * FROM posts JOIN users ON posts.author_uuid=users.uuid WHERE posts.uuid = :uuid'
         );
         $statement->execute([
             ':uuid' => (string)$uuid,
@@ -58,22 +59,25 @@ VALUES (:uuid, :author_uuid, :title, :text)'
     }
 
 
-//    public function getByPost(string $author_uuid): Post
-//    {
-//        $statement = $this->connection->prepare(
-//            'SELECT * FROM posts WHERE author_uuid = :author_uuid'
-//        );
-//        $statement->execute([
-//            ':author_uuid' => $author_uuid,
-//        ]);
-//
-//        return $this->getPost($statement, $author_uuid);
-//    }
+    /**
+     * @throws InvalidArgumentException
+     * @throws PostNotFoundException
+     */
+    public function getByPost(string $author_uuid): Post
+    {
+        $statement = $this->connection->prepare(
+            'SELECT * FROM posts JOIN users ON posts.author_uuid=users.uuid WHERE posts.author_uuid = :author_uuid'
+        );
+        $statement->execute([
+            ':author_uuid' => $author_uuid,
+        ]);
+
+        return $this->getPost($statement, $author_uuid);
+    }
 
 
     /**
      * @throws InvalidArgumentException
-     * @throws UserNotFoundException
      * @throws PostNotFoundException
      */
     private function getPost(PDOStatement $statement, string $uuid): Post
@@ -86,10 +90,14 @@ VALUES (:uuid, :author_uuid, :title, :text)'
             );
         }
 
-        $usersRepository = new SqliteUsersRepository($this->connection, $this->logger);
         return new Post(
             new UUID($result['uuid']),
-            $usersRepository->get(new UUID($result['author_uuid'])),
+            new User(
+                new UUID($result['uuid']),
+                $result['username'],
+                $result['password'],
+                new Name($result['first_name'], $result['last_name'])
+            ),
             $result['title'],
             $result['text'],
         );
